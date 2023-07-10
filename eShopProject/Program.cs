@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using eShopProject.Models;
+using eShopProject.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         .Build().GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<DbSeeder>();
+builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<CategoryService>();
 var app = builder.Build();
 using var scope = app.Services.CreateScope();
 var dbSeeder = scope.ServiceProvider.GetRequiredService<DbSeeder>();
