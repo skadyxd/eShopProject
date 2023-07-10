@@ -1,0 +1,50 @@
+@model List<Product>
+
+@{
+    ViewBag.Title = "Список всех продуктов";
+    Layout = "_Layout";
+}
+
+<div class="container">
+    <h1>@ViewBag.Title</h1>
+    <h2>
+        <!-- Trigger button -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
+            Добавить товар
+        </button>
+    </h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Название</th>
+            <th>Описание</th>
+            <th>Категория</th>
+            <th>Цена</th>
+            <th>Готов к продаже?</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td>@product.Name</td>
+                <td>@product.Description</td>
+                <td>@product.Category.Name</td>
+                <td>@product.Price</td>
+                @if (product.ReadyToSale)
+                {
+                    <td class="text-success">Да</td>
+                }
+                else
+                {
+                    <td class="text-danger">Нет</td>
+                }
+                <td>
+                    <a class="btn btn-primary" href="@Url.Action("Details", "Product", new { id = product.Id })">Подробнее</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

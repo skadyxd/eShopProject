@@ -1,0 +1,40 @@
+@model eShopProject.Models.Product
+
+@{
+    ViewBag.Title = "Подробнее";
+    Layout = "_Layout";
+}
+
+<div class="text-center">
+    <h1>Детали товара</h1>
+    <p>Название: @Model.Name</p>
+    <p>Описание: @Model.Description</p>
+    <p>Категория: @Model.Category.Name</p>
+    <p>Стоимость, ₽: @Model.Price</p>
+    <p>Готов к продаже? :
+        @if (Model.ReadyToSale)
+        {
+            <span class="text-success">Да</span>
+        }
+        else
+        {
+            <span class="text-danger">Нет</span>
+        }
+    </p>
+</div>
+
+<div class="text-center">
+    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModal">
+        Редактировать
+    </button>
+    
+    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+        Удалить
+    </button>
+    
+    <div>
+        <a class="btn btn-outline-dark mt-1" href="@Url.Action("Index", "Product")" role="button">
+            Назад
+        </a>
+    </div>
+</div>
