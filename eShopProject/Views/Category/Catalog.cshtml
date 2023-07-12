@@ -1,0 +1,66 @@
+@model List<Category>
+
+@{
+    ViewData["Title"] = "Catalog";
+}
+
+<div class="card-group" id="categoryContainer">
+    <!-- Categories will be loaded dynamically here -->
+</div>
+
+@section scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $.ajax({
+                url: '@Url.Action("GetParentCategoriesJson")',
+                type: 'GET',
+                dataType: 'json',
+                success: function(categories) {
+                    console.log(categories);
+                    
+                    var categoryContainer = $('#categoryContainer');
+                    
+                    $.each(categories, function(index, category) {
+                        var card = $('<div class="card">');
+                        var cardBody = $('<div class="card-body">');
+                        var cardTitle = $('<h5 class="card-title">').text(category.name);
+                        
+                        cardBody.append(cardTitle);
+                        card.append(cardBody);
+                        categoryContainer.append(card);
+                        
+                        // Load child categories for each parent category
+                        loadChildCategories(category.id, cardBody);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.log(error);
+                }
+            });
+        });
+        
+        function loadChildCategories(parentCategoryId, cardBody) {
+            $.ajax({
+                url: '@Url.Action("GetChildCategoriesJson")' + '?parentCategoryId=' + parentCategoryId,
+                type: 'GET',
+                dataType: 'json',
+                success: function(childCategories) {
+                    console.log(childCategories);
+                    
+                    var childCategoriesList = $('<ul class="list-group">');
+                    
+                    $.each(childCategories, function(index, childCategory) {
+                        var listItem = $('<button type="button" class="btn btn-outline-secondary">').text(childCategory.name);
+                        childCategoriesList.append(listItem);
+                    });
+                    
+                    cardBody.append(childCategoriesList);
+                },
+                error: function(xhr, status, error) {
+                    console.log(error);
+                }
+            });
+        }
+    </script>
+}
