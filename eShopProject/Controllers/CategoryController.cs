@@ -1,8 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
-using eShopProject.Models;
 using eShopProject.Services;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
+
+namespace eShopProject.Controllers;
 
 public class CategoryController : Controller
 {
@@ -13,11 +12,43 @@ public class CategoryController : Controller
         _categoryService = categoryService;
     }
     
+    /// <summary>
+    /// Отображает каталог.
+    /// </summary>
     [HttpGet]
-    public async Task<IActionResult> Catalog(CancellationToken cancellationToken)
+    public IActionResult Catalog()
     {
-        var categories = await _categoryService.GetParentCategoriesAsync(cancellationToken);
-        return View(categories);
+        return View();
     }
+    
+    /// <summary>
+    /// Получает список категорий, которые являются родительскими категориями в формате JSON.
+    /// </summary>
+    [HttpGet]
+    public async Task<IActionResult> GetParentCategoriesJson(CancellationToken cancellationToken)
+    {
+        var parentCategories = await _categoryService.GetParentCategoriesAsync(cancellationToken);
+        return Json(parentCategories);
+    }
+    
+    /// <summary>
+    /// Получает список дочерних категорий для указанного идентификатора родительской категории в формате JSON.
+    /// </summary>
+    [HttpGet]
+    public async Task<IActionResult> GetChildCategoriesJson(int parentCategoryId, CancellationToken cancellationToken)
+    {
+        var childCategories = await _categoryService.GetChildCategoriesAsync(parentCategoryId, cancellationToken);
+        return Json(childCategories);
+    }
+    
+    /// <summary>
+    /// Получает список конечных (листовых) категорий, которые не являются родительскими категориями в формате JSON.
+    /// </summary>
+    public async Task<IActionResult> GetLeafCategoriesJson()
+    {
+        var categories = await _categoryService.GetLeafCategoriesAsync(CancellationToken.None);
+        return Json(categories);
+    }
+
 
 }
