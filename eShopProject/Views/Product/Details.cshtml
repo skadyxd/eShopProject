@@ -38,3 +38,108 @@
         </a>
     </div>
 </div>
+
+<!-- Edit modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Заголовок модального окна</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm" asp-action="Edit" method="post">
+                    
+                    <div class="form-group">
+                        <input asp-for="Id" type="hidden">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Название продукта</label>
+                        <input type="text" class="form-control" name="Name" value="@Model.Name">
+                        <span data-valmsg-for="Name" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Описание продукта</label>
+                        <input type="text" class="form-control" name="Description" value="@Model.Description">
+                        <span data-valmsg-for="Description" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="CategoryId">Категория продукта</label>
+                        <select id="categorySelect" class="form-control" name="CategoryId"></select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Стоимость, ₽</label>
+                        <input type="text" class="form-control" name="Price" value="@Model.Price">
+                        <span data-valmsg-for="Price" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Готов к продаже?</label>
+                        <input type="checkbox" name="ReadyToSale" @(Model.ReadyToSale ? "checked" : "")>
+                        
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="deleteModalLabel">Подтвердите свое действие</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <form id="deleteForm" asp-action="Delete" method="post">
+                    
+                    <div class="form-group">
+                        <input asp-for="Id" type="hidden">
+                    </div>
+                    
+                    <p>Вы уверены, что хотите <span class="fw-bold">удалить</span> @Model.Name ?</p>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                        <button type="submit" class="btn btn-primary mt-1">Удалить</button>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(function() {
+            $.ajax({
+                url: '@Url.Action("GetLeafCategoriesJson", "Category")',
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    console.log(data)
+                    var select = $('#categorySelect');
+                    select.empty();
+                    $.each(data, function(index, category) {
+                        select.append($('<option></option>').val(category.id).text(category.name));
+                    });
+                }
+            });
+        });
+    </script>
+}
