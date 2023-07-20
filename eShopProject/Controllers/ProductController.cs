@@ -17,11 +17,63 @@ public class ProductController : Controller
     /// Отображает главную страницу, со списком всех продуктов.
     /// </summary>
     [HttpGet]
-    public async Task<IActionResult> Index(CancellationToken cancellationToken)
+    public IActionResult Index()
     {
-        return View(await _productService.GetProductsAsync(cancellationToken));
+        return View();
     }
     
+    [HttpGet]
+    public async Task<IActionResult> GetProductsSortJson(string sortName, string sortOrder, CancellationToken cancellationToken)
+    {
+        // var products = await _productService.GetProductsAsync(CancellationToken.None);
+        // return Json(products);
+        switch (sortName.ToLower())
+        {
+            case "price":
+                if (sortOrder.ToLower() == "desc")
+                {
+                    var products = await _productService.SortByPriceDescendingAsync(cancellationToken);
+                    return Json(products);
+                }
+                else
+                {
+                    var products = await _productService.SortByPriceAscendingAsync(cancellationToken);
+                    return Json(products);
+                }
+            
+        }
+
+        return Json(await _productService.GetProductsAsync(cancellationToken));
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetProductsJson(CancellationToken cancellationToken)
+    {
+        var products = await _productService.GetProductsAsync(cancellationToken);
+        return Json(products);
+    }
+    
+    /// <summary>
+    /// Выдает список продуктов отсортированных по цене по убыванию в виде json файла
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    public async Task<IActionResult> GetSortByPriceDescendingJson()
+    {
+        var products = await _productService.SortByPriceDescendingAsync(CancellationToken.None);
+        return Json(products);
+    }
+    
+    /// <summary>
+    /// Выдает список продуктов отсортированных по цене по возрастанию в виде json файла
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    public async Task<IActionResult> GetSortByPriceAscendingJson()
+    {
+        var products = await _productService.SortByPriceAscendingAsync(CancellationToken.None);
+        return Json(products);
+    }
     /// <summary>
     /// Отображает страницу с подробной информацией по указанному идентификатору.
     /// </summary>

@@ -1,116 +1,75 @@
-    @model List<Product>
-    
-    @{
-        ViewBag.Title = "Список всех продуктов";
-        Layout = "_Layout";
+@{
+    ViewBag.Title = "Список всех продуктов";
+    Layout = "_Layout";
+}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.css" rel="stylesheet">
+<script src="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.js"></script>
+<script src="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table-locale-all.min.js"></script>
+
+<table
+  id="productsTable"
+  data-toggle="table"
+  data-height="575"
+  data-ajax="ajaxRequest"
+  data-custom-sort="customSort"
+  data-locale="ru-RU"
+  data-search="true"
+  data-pagination="true">
+    <thead>
+        <tr>
+            <th data-field="id">ID</th>
+            <th data-field="name" data-sortable="true">Название</th>
+            <th data-field="description">Описание</th>
+            <th data-field="category.name">Категория</th>
+            <th data-field="price" data-sortable="true">Цена</th>
+            <th data-field="readyToSale" data-formatter="formatReadyToSale">Готов к продаже?</th>
+            <th data-formatter="viewFormatter">Просмотр</th>
+        </tr>
+    </thead>
+</table>
+
+<script>
+  // Функция для вывода списка продуктов
+  function ajaxRequest(params) {
+    $.ajax({
+      url: '/Product/GetProductsJson',
+      type: 'GET',
+      dataType: 'json',
+      success: function(data) {
+        console.log(params)
+        params.success(data);
+      }
+    });
+  }
+   
+  function customSort(sortName, sortOrder) {
+    $.ajax({
+      url: '/Product/GetProductsSortJson',
+      type: 'GET',
+      dataType: 'json',
+      data: {
+        sortName: sortName,
+        sortOrder: sortOrder
+      },
+      success: function(data) {
+        $('#productsTable').bootstrapTable('removeAll');
+  
+        $('#productsTable').bootstrapTable('load', data);
+      }
+    });
+  }
+  // Функция, переименовывает поле readyToSale
+  function formatReadyToSale(value) {
+    if (value) {
+      return '<span class="text-success">Да</span>';
+    } else {
+      return '<span class="text-danger">Нет</span>';
     }
-    
-    <div class="container">
-        <h1>@ViewBag.Title</h1>
-        <h2>
-            <!-- Trigger button -->
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
-                Добавить товар
-            </button>
-        </h2>
-        <table class="table">
-            <thead>
-            <tr>
-                <th>Название</th>
-                <th>Описание</th>
-                <th>Категория</th>
-                <th>Цена</th>
-                <th>Готов к продаже?</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var product in Model)
-            {
-                <tr>
-                    <td>@product.Name</td>
-                    <td>@product.Description</td>
-                    <td>@product.Category.Name</td>
-                    <td>@product.Price</td>
-                    @if (product.ReadyToSale)
-                    {
-                        <td class="text-success">Да</td>
-                    }
-                    else
-                    {
-                        <td class="text-danger">Нет</td>
-                    }
-                    <td>
-                        <a class="btn btn-primary" href="@Url.Action("Details", "Product", new { id = product.Id })">Подробнее</a>
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
-    </div>
-    
-    <!-- Create modal -->
-    <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="createModalLabel">Добавить новый продукт</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
-                </div>  
-                <div class="modal-body">
-                    <form id="addForm" asp-action="Create" method="post">
-                        
-                        <div class="form-group">
-                            <label>Название продукта</label>
-                            <input type="text" class="form-control" name="Name">
-                            <span data-valmsg-for="Name" class="text-danger"></span>
-                        </div>
-    
-                        <div class="form-group">
-                            <label>Описание</label>
-                            <input type="text" class="form-control" name="Description">
-                            <span data-valmsg-for="Description" class="text-danger"></span>
-                        </div>
-    
-                        <div class="form-group">
-                            <label for="CategoryId">Категория продукта</label>
-                            <select id="categorySelect" class="form-control" name="CategoryId"></select>
-                        </div>
-    
-                        <div class="form-group">
-                            <label>Цена</label>
-                            <input type="text" class="form-control" name="Price">
-                            <span data-valmsg-for="Price" class="text-danger"></span>
-                        </div>
-    
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                            <button id="saveChangesButton" type="submit" class="btn btn-primary mt-1">Создать</button>
-                        </div>
-                        
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    @section Scripts {
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script>
-            $(function() {
-                $.ajax({
-                    url: '@Url.Action("GetLeafCategoriesJson", "Category")',
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(data) {
-                        console.log(data)
-                        var select = $('#categorySelect');
-                        select.empty();
-                        $.each(data, function(index, category) {
-                            select.append($('<option></option>').val(category.id).text(category.name));
-                        });
-                    }
-                });
-            });
-        </script>
-    }
+  }
+
+  // Функция для отрисовки кнопки "Подробнее" на каждой строчке
+  function viewFormatter(value, row) {
+    return '<a class="btn btn-primary mb-2" href="/Product/Details/' + row.id + '" role="button">' + 'Подробнее' + '</a>';
+  }
+</script>

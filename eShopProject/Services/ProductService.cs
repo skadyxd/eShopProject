@@ -38,6 +38,34 @@ public class ProductService
             .Include(p => p.Category)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
+
+    /// <summary>
+    /// Получает список продуктов, которые будут отсортированы по цене по убыванию.
+    /// </summary>
+    /// <param name="cancellationToken">Токен отмены для асинхронной операции.</param>
+    /// <returns>Список продуктов отсортированных по цене по убыванию</returns>
+    public async Task<List<Product>> SortByPriceDescendingAsync(CancellationToken cancellationToken)
+    {
+        return await _context.Products
+            .Include(p => p.Category)
+            .OrderByDescending(x => x.Price)
+            .ToListAsync(cancellationToken);
+
+    }
+    
+    /// <summary>
+    /// Получает список продуктов, которые будут отсортированы по цене по возрастанию.
+    /// </summary>
+    /// <param name="cancellationToken">Токен отмены для асинхронной операции.</param>
+    /// <returns>Список продуктов отсортированных по цене по возрастанию</returns>
+    public async Task<List<Product>> SortByPriceAscendingAsync(CancellationToken cancellationToken)
+    {
+        return await _context.Products
+            .Include(p => p.Category)
+            .OrderBy(x => x.Price)
+            .ToListAsync(cancellationToken);
+
+    }
     
     /// <summary>
     /// Добавляет новый продукт.
